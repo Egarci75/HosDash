@@ -2,39 +2,58 @@
 <html>
 <head>
     <title>Hospital Monitoring Dashboard</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
 
     <h1>Hospital Monitoring Dashboard</h1>
 
-    <form action="/users">
-        <button type="submit">Logged-In Users</button>
-    </form>
+    <div class="button-bar">
 
-    <br>
+        <button onclick="loadData('/users')">
+            Logged-In Users
+        </button>
 
-    <form action="/ssh">
-        <button type="submit">SSH Activity</button>
-    </form>
+        <button onclick="loadData('/ssh')">
+            SSH Activity
+        </button>
 
-    <br>
+        <button onclick="loadData('/failed')">
+            Failed Logins
+        </button>
 
-    <form action="/failed">
-        <button type="submit">Failed Logins</button>
-    </form>
+        <button onclick="loadData('/network')">
+            Network Status
+        </button>
 
-    <br>
+        <button onclick="loadData('/patients')">
+            Patient Data
+        </button>
 
-    <form action="/network">
-        <button type="submit">Network Status</button>
-    </form>
+    </div>
 
-    <br>
+    <pre id="terminal">
+Hospital Monitoring Dashboard Ready...
+Select a monitoring option above.
+    </pre>
 
-    <form action="/patients">
-        <button type="submit">Patient Data</button>
-    </form>
+<script>
+function loadData(route)
+{
+    fetch(route)
+        .then(response => response.text())
+        .then(data =>
+        {
+            document.getElementById("terminal").textContent = data;
+        })
+        .catch(error =>
+        {
+            document.getElementById("terminal").textContent =
+                "Error: " + error;
+        });
+}
+</script>
 
 </body>
 </html>
