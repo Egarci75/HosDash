@@ -18,7 +18,15 @@ def ssh():
 
 @app.route("/failed")
 def failed():
-    return "<h1>Failed Logins</h1><p>Coming Soon</p>"
+    try:
+        output = subprocess.check_output(
+            "grep 'Failed password' /var/log/auth.log | tail -20",
+            shell=True,
+            text=True
+        )
+        return f"<pre>{output}</pre>"
+    except:
+        return "<pre>No failed login entries found.</pre>"
 
 @app.route("/network")
 def network():
