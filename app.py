@@ -9,33 +9,39 @@ def home():
 
 @app.route("/users")
 def users():
-    output = subprocess.check_output("w", shell=True, text=True)
-    return f"<pre>{output}</pre>"
+    return subprocess.check_output("w", shell=True, text=True)
 
 @app.route("/ssh")
 def ssh():
-    return "<h1>SSH Activity</h1><p>Coming Soon</p>"
+    return subprocess.check_output("last | head -20", shell=True, text=True)
 
 @app.route("/failed")
 def failed():
     try:
-        output = subprocess.check_output(
+        return subprocess.check_output(
             "grep 'Failed password' /var/log/auth.log | tail -20",
             shell=True,
             text=True
         )
-        return f"<pre>{output}</pre>"
     except:
-        return "<pre>No failed login entries found.</pre>"
+        return "No failed login entries found."
 
 @app.route("/network")
 def network():
-    output = subprocess.check_output("ip addr", shell=True, text=True)
-    return f"<pre>{output}</pre>"
+    return subprocess.check_output(
+        "ip addr",
+        shell=True,
+        text=True
+    )
 
 @app.route("/patients")
 def patients():
-    return "<h1>Patient Data</h1><p>Coming Soon</p>"
+    return """
+Patient Monitoring
+
+Patient data source not configured yet.
+Waiting for integration.
+"""
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
+    app.run(host="0.0.0.0", port=5000, debug=True)
