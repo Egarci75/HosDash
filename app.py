@@ -1,32 +1,11 @@
+from flask import Flask, render_template
 import subprocess
 
-app = Flask(name)
+app = Flask(__name__)
 
 @app.route("/")
 def home():
-    return """
-    <h1>Hospital Monitoring Dashboard</h1>
-
-    <form action="/users">
-        <button type="submit">Logged-In Users</button>
-    </form>
-
-    <form action="/ssh">
-        <button type="submit">SSH Activity</button>
-    </form>
-
-    <form action="/failed">
-        <button type="submit">Failed Logins</button>
-    </form>
-
-    <form action="/network">
-        <button type="submit">Network Status</button>
-    </form>
-
-    <form action="/patients">
-        <button type="submit">Patient Data</button>
-    </form>
-    """
+    return render_template("index.html")
 
 @app.route("/users")
 def users():
@@ -49,5 +28,5 @@ def network():
 def patients():
     return "<h1>Patient Data</h1><p>Coming Soon</p>"
 
-if name == "main":
+if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
