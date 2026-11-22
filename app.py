@@ -30,7 +30,8 @@ def failed():
 
 @app.route("/network")
 def network():
-    return "<h1>Network Status</h1><p>Coming Soon</p>"
+    output = subprocess.check_output("ip addr", shell=True, text=True)
+    return f"<pre>{output}</pre>"
 
 @app.route("/patients")
 def patients():
