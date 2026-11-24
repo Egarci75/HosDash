@@ -4,18 +4,8 @@ import re
 
 app = Flask(__name__)
 
+SUBNET = "10.0.2.0/24"
 
-def run_remote_follow(cmd, follow_seconds=4):
-    full_cmd = SSH_BASE + cmd
-    proc = subprocess.Popen(full_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-    try:
-        out, err = proc.communicate(timeout=follow_seconds)
-    except subprocess.TimeoutExpired:
-        proc.kill()
-        out, err = proc.communicate()
-    if err:
-        out += "\n--- stderr ---\n" + err
-    return out
 
 @app.route("/")
 def home():
@@ -27,12 +17,19 @@ def users():
 
 @app.route("/ssh")
 def ssh():
-    return sub_process.getoutput("last -n 20")
+    return subprocess.getoutput("last -n 20")
+    
 @app.route("/failed")
 def failed():
-    return subprocess.getoutput(
+    output = subprocess.getoutput(
         "grep 'Failed password' /var/log/auth.log | tail -20"
     )
+
+    if not output.strip():
+        return "No failed login attempts detected."
+
+    return output
+    
 @app.route("/network")
 def network():
     try:
