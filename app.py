@@ -17,7 +17,9 @@ def users():
 
 @app.route("/ssh")
 def ssh():
-    return subprocess.getoutput("last -n 20")
+    return subprocess.getoutput(
+        "grep ssh /var/log/auth.log | tail -20"
+    )
     
 @app.route("/failed")
 def failed():
