@@ -4,28 +4,6 @@ import re
 
 app = Flask(__name__)
 
-MREAD_HOST = "192.168.64.2"
-MREAD_USER = "Mread"
-SSH_KEY = "/home/darrel/.ssh/mread_key"
-SUBNET = "192.168.64.0/24"
-
-SSH_BASE = [
-    "ssh", "-i", SSH_KEY,
-    "-o", "StrictHostKeyChecking=accept-new",
-    "-o", "ConnectTimeout=5",
-    f"{MREAD_USER}@{MREAD_HOST}",
-]
-
-def run_remote(cmd, timeout=15):
-    full_cmd = SSH_BASE + cmd
-    try:
-        result = subprocess.run(full_cmd, capture_output=True, text=True, timeout=timeout)
-        out = result.stdout
-        if result.stderr:
-            out += "\n--- stderr ---\n" + result.stderr
-        return out
-    except subprocess.TimeoutExpired:
-        return "Command timed out."
 
 def run_remote_follow(cmd, follow_seconds=4):
     full_cmd = SSH_BASE + cmd
@@ -45,20 +23,16 @@ def home():
 
 @app.route("/users")
 def users():
-    return run_remote(["w"])
+    return subprocess.getoutput("w")
 
 @app.route("/ssh")
 def ssh():
-    return run_remote(["wtmpdb", "last", "-n", "20"])
-
+    return sub_process.getoutput("last -n 20")
 @app.route("/failed")
 def failed():
-    raw = run_remote_follow(["sudo", "tail", "-f", "/var/log/auth.log"])
-    failed_lines = [line for line in raw.splitlines() if "Failed password" in line]
-    if not failed_lines:
-        return "No failed login attempts seen in this window."
-    return "\n".join(failed_lines)
-
+    return subprocess.getoutput(
+        "grep 'Failed password' /var/log/auth.log | tail -20"
+    )
 @app.route("/network")
 def network():
     try:
@@ -143,7 +117,9 @@ def network():
 
 @app.route("/patients")
 def patients():
-    return run_remote(["ls", "-la", "/srv/clinical-data"])
+    return subprocess.getoutput(
+        "ls -la /srv/clinical-data"
+    )
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
