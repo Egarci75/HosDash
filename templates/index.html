@@ -38,19 +38,36 @@ Hospital Monitoring Dashboard Ready...
 Select a monitoring option above.
     </pre>
 
+    <div id="network-result" style="display:none;"></div>
+
 <script>
 function loadData(route)
 {
+    const terminal = document.getElementById("terminal");
+    const networkResult = document.getElementById("network-result");
+
     fetch(route)
         .then(response => response.text())
         .then(data =>
         {
-            document.getElementById("terminal").textContent = data;
+            if (route === "/network")
+            {
+                terminal.style.display = "none";
+                networkResult.style.display = "block";
+                networkResult.innerHTML = data;
+            }
+            else
+            {
+                networkResult.style.display = "none";
+                terminal.style.display = "block";
+                terminal.textContent = data;
+            }
         })
         .catch(error =>
         {
-            document.getElementById("terminal").textContent =
-                "Error: " + error;
+            networkResult.style.display = "none";
+            terminal.style.display = "block";
+            terminal.textContent = "Error: " + error;
         });
 }
 </script>
